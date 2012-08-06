@@ -16,8 +16,8 @@
     channelFor: function(model) {
       var self = this;
 
-      var part1 = self.__sync_channel__();
-      var part2 = model.__sync_channel__();
+      var part1 = self.__syncChannel__();
+      var part2 = model.__syncChannel__();
       if(part1 < part2) {
         return part1+part2;
       } else {
@@ -43,9 +43,9 @@
 
       console.log('publish on', attr, channel);
 
-      if($.inArray(channel, self.__published_channels__()) === -1) {
+      if($.inArray(channel, self.__publishedChannels__()) === -1) {
         self[attr].publishOn(channel);
-        self.__published_channels__.push(channel);
+        self.__publishedChannels__.push(channel);
       }
     },
 
@@ -54,9 +54,9 @@
 
       console.log('stop publish on', attr, channel);
 
-      if($.inArray(channel, self.__published_channels__()) > -1) {
+      if($.inArray(channel, self.__publishedChannels__()) > -1) {
         self.stopPublishingOn(channel);
-        self.__published_channels__.remove(channel);
+        self.__publishedChannels__.remove(channel);
       }
     },
 
@@ -65,9 +65,9 @@
 
       console.log('subscribe to', attr, channel);
 
-      if($.inArray(channel, self.__subscribed_channels__()) === -1) {
+      if($.inArray(channel, self.__subscribedChannels__()) === -1) {
         self[attr].subscribeTo(channel);
-        self.__subscribed_channels__.push(channel);
+        self.__subscribedChannels__.push(channel);
       }
     },
 
@@ -76,9 +76,9 @@
 
       console.log('unsubscribe from', attr, channel);
 
-      if($.inArray(channel, self.__subscribed_channels__()) > -1) {
+      if($.inArray(channel, self.__subscribedChannels__()) > -1) {
         self[attr].unsubscribeFrom(channel);
-        self.__subscribed_channels__.remove(channel);
+        self.__subscribedChannels__.remove(channel);
       }
     },
 
@@ -87,9 +87,9 @@
 
       console.log('sync with', attr, channel);
 
-      if($.inArray(channel, self.__synced_channels__()) === -1) {
+      if($.inArray(channel, self.__syncedChannels__()) === -1) {
         self[attr].syncWith(channel);
-        self.__synced_channels__.push(channel);
+        self.__syncedChannels__.push(channel);
       }
     },
 
@@ -98,10 +98,10 @@
 
       console.log('stop syncing with', attr, channel);
 
-      if($.inArray(channel, self.__synced_channels__()) > -1) {
+      if($.inArray(channel, self.__syncedChannels__()) > -1) {
         self[attr].unsubscribeFrom(channel);
         self[attr].stopPublishingOn(channel);
-        self.__synced_channels__.remove(channel);
+        self.__syncedChannels__.remove(channel);
       }
     },
 
@@ -155,11 +155,11 @@
 
   $.extend(ko.Model, Model);
 
-  ko.Model.__model_extensions__.push(function(self) {
-    self.__sync_channel__ = ko.observable(self.generate_sync_channel());
-    self.__subscribed_channels__ = ko.observableArray();
-    self.__published_channels__ = ko.observableArray();
-    self.__synced_channels__ = ko.observableArray();
+  ko.Model.__modelExtensions__.push(function(self) {
+    self.__syncChannel__ = ko.observable(self.generate_sync_channel());
+    self.__subscribedChannels__ = ko.observableArray();
+    self.__publishedChannels__ = ko.observableArray();
+    self.__syncedChannels__ = ko.observableArray();
   });
 })(ko);
 
