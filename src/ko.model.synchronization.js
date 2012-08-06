@@ -108,7 +108,7 @@
     sync: function(model, how) {
       var self = this;
 
-      var channel = self.channel_for(model);
+      var channel = self.channelFor(model);
 
       if(how === 'to') {
         for(var attr in self.__defaults__) {
@@ -156,7 +156,7 @@
   $.extend(ko.Model, Model);
 
   ko.Model.__modelExtensions__.push(function(self) {
-    self.__syncChannel__ = ko.observable(self.generate_sync_channel());
+    self.__syncChannel__ = ko.observable(self.generateSyncChannel());
     self.__subscribedChannels__ = ko.observableArray();
     self.__publishedChannels__ = ko.observableArray();
     self.__syncedChannels__ = ko.observableArray();
