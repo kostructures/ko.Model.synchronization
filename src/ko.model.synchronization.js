@@ -110,17 +110,17 @@
 
       var channel = self.channel_for(model);
 
-      if(how === 'to') {                // model updates self
-        for(var attr in self.__defaults__) {
-          model.publishOn(attr, channel+attr);
-          self.subscribeTo(attr, channel+attr);
-        }
-      } else if(how === 'on') {       // self updates model
+      if(how === 'to') {
         for(var attr in self.__defaults__) {
           model.subscribeTo(attr, channel+attr);
           self.publishOn(attr, channel+attr);
         }
-      } else {                          // two way update
+      } else if(how === 'from') {
+        for(var attr in self.__defaults__) {
+          model.publishOn(attr, channel+attr);
+          self.subscribeTo(attr, channel+attr);
+        }
+      } else {
         for(var attr in self.__defaults__) {
           model.syncWith(attr, channel+attr);
           self.syncWith(attr, channel+attr);
@@ -135,13 +135,13 @@
 
       if(how === 'to') {
         for(var attr in self.__defaults__) {
-          model.stopPublishingOn(attr, channel+attr);
-          self.unsubscribeFrom(attr, channel+attr);
-        }
-      } else if(how === 'on') {
-        for(var attr in self.__defaults__) {
           model.unsubscribeFrom(attr, channel+attr);
           self.stopPublishingOn(attr, channel+attr);
+        }
+      } else if(how === 'from') {
+        for(var attr in self.__defaults__) {
+          model.stopPublishingOn(attr, channel+attr);
+          self.unsubscribeFrom(attr, channel+attr);
         }
       } else {
         for(var attr in self.__defaults__) {
