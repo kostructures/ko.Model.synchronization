@@ -193,6 +193,38 @@ anotherUser.email('both@example.com');
 currentUser.email();
 > 'both@example.com'</pre></code>
 
+        <p><em>example: <code>currentUser.sync(anotherUser, 'to')</code></em></p>
+
+<pre><code>currentUser.sync(anotherUser, 'to');
+currentUser.name('Dan');
+
+anotherUser.name();
+> "Dan"
+
+anotherUser.name('John');
+
+anotherUser.name();
+> "John"
+
+currentUser.name();
+> "Dan"</pre></code>
+
+        <p><em>example: <code>currentUser.sync(anotherUser, 'from')</code></em></p>
+
+<pre><code>currentUser.sync(anotherUser, 'from');
+anotherUser.name('Dan');
+
+currentUser.name();
+> "Dan"
+
+currentUser.name('John');
+
+currentUser.name();
+> "John"
+
+anotherUser.name();
+> "Dan"</pre></code>
+
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/bluefocus">bluefocus</a></p>
