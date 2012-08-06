@@ -3,10 +3,16 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>ko.Model.synchronization by kostructures</title>
+    <title>Knockout Structures - ko.Model.synchronization</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="https://raw.github.com/douglascrockford/JSON-js/master/json2.js"></script>
+    <script src="http://cloud.github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.js"></script>
+    <script src="http://cloud.github.com/downloads/rniemeyer/knockout-postbox/knockout-postbox.min.js"></script>
+    <script src="http://cloud.github.com/downloads/kostructures/ko.Model/ko.model-0.1.3.js"></script>
+    <script src="https://raw.github.com/kostructures/ko.Model.synchronization/master/src/ko.model.synchronization.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -16,7 +22,7 @@
     <div class="wrapper">
       <header>
         <h1>ko.Model.synchronization</h1>
-        <p>A synchronization extension for ko.Model</p>
+        <p>A synchronization extension for <a href="http://kostructures.com/ko.Model">ko.Model</a></p>
 
         <p class="view"><a href="https://github.com/kostructures/ko.Model.synchronization">View the Project on GitHub <small>kostructures/ko.Model.synchronization</small></a></p>
 
@@ -34,6 +40,158 @@
           I am in the process of putting together documentation and code samples.
           Follow this repository and I will notify you when they are done.
         </p>
+
+        <h3>About this extension</h3>
+
+        <p>
+          This extension to the <a href="http://kostructures.github.com/ko.Model">ko.Model</a>
+          Knockout JS Structure leverages the native pub/sub capabilities of KnockoutJS
+          through a wonderful library, <a href="https://github.com/rniemeyer/knockout-postbox" target="_blank">
+          knockout-postbox</a>, by <a href="https://github.com/rniemeyer" target="_blank">Ryan Niemeyer</a>.
+        </p>
+
+        <h3>Installation</h3>
+
+        <p>
+          To use this extension, you will need to have both
+          <a href="https://github.com/rniemeyer/knockout-postbox" target="_blank">knockout-postbox</a> and
+          <a href="https://github.com/douglascrockford/JSON-js" target="_blank">json2</a> included before
+          ko.Model.validation in addition to ko.Model. Here is how it's included on this page:
+        </p>
+
+<pre><code style="font-size: 0.6em;">&lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://raw.github.com/douglascrockford/JSON-js/master/json2.js"&gt;&lt;/script&gt;
+&lt;script src="http://cloud.github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.js"&gt;&lt;/script&gt;
+&lt;script src="http://cloud.github.com/downloads/rniemeyer/knockout-postbox/knockout-postbox.min.js"&gt;&lt;/script&gt;
+&lt;script src="http://cloud.github.com/downloads/kostructures/ko.Model/ko.model-0.1.3.js"&gt;&lt;/script&gt;
+&lt;script src="https://raw.github.com/kostructures/ko.Model.synchronization/master/src/ko.model.synchronization.js"&gt;&lt;/script&gt;
+</pre></code>
+
+        <h3>What does it do?</h3>
+
+        <p>
+          <a href="https://github.com/rniemeyer/knockout-postbox" target="_blank">Knockout Postbox</a>
+          is an awesome concept. It's designed to take most of the work out of syncing observables.
+          As Ryan notes in <a href="http://www.knockmeout.net/2012/05/using-ko-native-pubsub.html"
+          target="_blank">his blog</a>:
+        </p>
+        <p>
+          &quot;Creating direct references between [observables] just
+          doesn't feel right and can lead you down a path where each view model has lost its independence
+          and cannot be used effectively without the other objects.&quot;
+        </p>
+        <p>
+          He instead took a messaging
+          approach. Benefits include (again extracted from his
+          <a href="http://www.knockmeout.net/2012/05/using-ko-native-pubsub.html" target="_blank">his
+          blog</a>):
+
+          <ul>
+            <li>&quot;Components remain independent. They can be developed, tested, and used in isolation.&quot;</li>
+            <li>
+              &quot;Knockout view models and non-KO components can communicate using a common interface
+              without direct knowledge of each other.&quot;
+            </li>
+            <li>
+              &quot;Components can be safely refactored. Properties can be renamed, moved, and adjusted without
+              worrying about breaking compatibility.&quot;
+            </li>
+          </ul>
+        </p>
+
+        <p>
+          On it's own, the concept is perfect. ko.Model.synchronization simply wraps it and simplifies
+          the interface for use with ko.Model.
+        </p>
+
+        <h3>Usage</h3>
+
+        <p>
+          These examples will use the same user model described in <a href="http://kostructures.com/ko.Model">
+          the documentation for ko.Model</a>.
+        </p>
+
+<pre><code>var User = function(attrs) {
+  var self = this;
+  $.extend(self, ko.Model);
+
+  self.attributes({
+    email: '',
+    id: null,
+    name: '',
+    phoneNumbers: []
+  });
+
+  self.initialize(attrs);
+};</pre></code>
+
+        <p><code>.sync(model [, how])</code></p>
+
+        <p>
+          Sync takes in another object with the same attributes as the current object and subscribes each attribute
+          to auto-generated postbox channels.
+        </p>
+
+        <p>
+          It takes an optional <code>how</code> argument which creates a one way sync. If <code>how</code>
+          equals <code>'to'</code>, the attributes on the model on which the function was called will publish their
+          changes to the attributes on the model passed as the function's first argument, but not subscribe to
+          changes. If <code>how</code> equals <code>'from'</code>, the attributes on the model on which the function
+          was called will subscribe to changes, but not publish their own changes.
+        </p>
+
+        <p>
+          The examples below are built upon the following example models:
+        </p>
+
+<pre><code>var currentUser = new User({
+  name: 'Dan Matthews',
+  email: 'dan@bluefoc.us',
+  phoneNumbers: ['(212) 555-5555']
+});
+
+var anotherUser = new User({
+  name: 'John Doe',
+  email: 'john@doe.com',
+  phoneNumbers: []
+});</pre></code>
+
+        <p><em>example: <code>currentUser.sync(anotherUser)</code></em></p>
+
+<pre><code>currentUser.name();
+> "Dan Matthews"
+
+anotherUser.name();
+> "John Doe"
+
+currentUser.sync(anotherUser);
+
+currentUser.name();
+> "Dan Matthews"
+
+anotherUser.name();
+> "Dan Matthews"
+
+currentUser.phoneNumbers();
+> ["(212) 555-5555"]
+
+anotherUser.phoneNumbers();
+> ["(212) 555-5555"]
+
+currentUser.phoneNumbers.push('(917) 555-5555');
+
+anotherUser.phoneNumbers();
+> ["(212) 555-5555", "(917) 555-5555"]
+
+anotherUser.phoneNumbers.remove('(212) 555-5555');
+
+currentUser.phoneNumbers();
+> ["(917) 555-5555"]
+
+anotherUser.email('both@example.com');
+
+currentUser.email();
+> 'both@example.com'</pre></code>
 
       </section>
       <footer>
