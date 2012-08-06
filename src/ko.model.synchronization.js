@@ -35,7 +35,7 @@
         channel += selectFrom[(Math.floor(Math.random()*(high-1)) + 1)];
       }
 
-      return name;
+      return channel;
     },
 
     publishOn: function(attr, channel) {
