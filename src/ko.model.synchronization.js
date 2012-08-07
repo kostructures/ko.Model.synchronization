@@ -41,8 +41,6 @@
     publishOn: function(attr, channel) {
       var self = this;
 
-      console.log('publish on', attr, channel);
-
       if($.inArray(channel, self.__publishedChannels__()) === -1) {
         self[attr].publishOn(channel);
         self.__publishedChannels__.push(channel);
@@ -51,8 +49,6 @@
 
     stopPublishingOn: function(attr, channel) {
       var self = this;
-
-      console.log('stop publish on', attr, channel);
 
       if($.inArray(channel, self.__publishedChannels__()) > -1) {
         self.stopPublishingOn(channel);
@@ -63,8 +59,6 @@
     subscribeTo: function(attr, channel) {
       var self = this;
 
-      console.log('subscribe to', attr, channel);
-
       if($.inArray(channel, self.__subscribedChannels__()) === -1) {
         self[attr].subscribeTo(channel);
         self.__subscribedChannels__.push(channel);
@@ -73,8 +67,6 @@
 
     unsubscribeFrom: function(attr, channel) {
       var self = this;
-
-      console.log('unsubscribe from', attr, channel);
 
       if($.inArray(channel, self.__subscribedChannels__()) > -1) {
         self[attr].unsubscribeFrom(channel);
@@ -85,8 +77,6 @@
     syncWith: function(attr, channel) {
       var self = this;
 
-      console.log('sync with', attr, channel);
-
       if($.inArray(channel, self.__syncedChannels__()) === -1) {
         self[attr].syncWith(channel);
         self.__syncedChannels__.push(channel);
@@ -95,8 +85,6 @@
 
     stopSyncingWith: function(attr, channel) {
       var self = this;
-
-      console.log('stop syncing with', attr, channel);
 
       if($.inArray(channel, self.__syncedChannels__()) > -1) {
         self[attr].unsubscribeFrom(channel);
