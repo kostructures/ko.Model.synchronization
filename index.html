@@ -26,22 +26,27 @@
 
         <p class="view"><a href="https://github.com/kostructures/ko.Model.synchronization">View the Project on GitHub <small>kostructures/ko.Model.synchronization</small></a></p>
 
-
         <ul>
           <li><a href="https://github.com/kostructures/ko.Model.synchronization/zipball/master">Download <strong>ZIP File</strong></a></li>
           <li><a href="https://github.com/kostructures/ko.Model.synchronization/tarball/master">Download <strong>TAR Ball</strong></a></li>
           <li><a href="https://github.com/kostructures/ko.Model.synchronization">View On <strong>GitHub</strong></a></li>
         </ul>
+
+        <br />
+        <p>Headings</p>
+        <div class="view"><a href="#about">About this extension</a></div>
+        <div class="view"><a href="#installation">Installation</a></div>
+        <div class="view"><a href="#what">What does it do?</a></div>
+        <div class="view"><a href="#usage">Usage</a></div>
+        <div class="view"><a href="#other">Other Functions</a></div>
+        <br />
+
+        <p>Main Functions</p>
+        <div class="view"><a href="#sync">.sync(model [, how])</a></div>
+        <div class="view"><a href="#unsync">.unsync(model [, how])</a></div>
       </header>
       <section>
-        <h3>Coming soon.</h3>
-
-        <p>
-          I am in the process of putting together documentation and code samples.
-          Follow this repository and I will notify you when they are done.
-        </p>
-
-        <h3>About this extension</h3>
+        <h3 id="about">About this extension</h3>
 
         <p>
           This extension to the <a href="http://kostructures.github.com/ko.Model">ko.Model</a>
@@ -50,7 +55,7 @@
           knockout-postbox</a>, by <a href="https://github.com/rniemeyer" target="_blank">Ryan Niemeyer</a>.
         </p>
 
-        <h3>Installation</h3>
+        <h3 id="installation">Installation</h3>
 
         <p>
           To use this extension, you will need to have both
@@ -67,7 +72,7 @@
 &lt;script src="https://raw.github.com/kostructures/ko.Model.synchronization/master/src/ko.model.synchronization.js"&gt;&lt;/script&gt;
 </pre></code>
 
-        <h3>What does it do?</h3>
+        <h3 id="what">What does it do?</h3>
 
         <p>
           <a href="https://github.com/rniemeyer/knockout-postbox" target="_blank">Knockout Postbox</a>
@@ -104,7 +109,7 @@
           the interface for use with ko.Model.
         </p>
 
-        <h3>Usage</h3>
+        <h3 id="usage">Usage</h3>
 
         <p>
           These examples will use the same user model described in <a href="http://kostructures.com/ko.Model">
@@ -125,11 +130,11 @@
   self.initialize(attrs);
 };</pre></code>
 
-        <p><code>.sync(model [, how])</code></p>
+        <p id="sync"><code>.sync(model [, how])</code></p>
 
         <p>
-          Sync takes in another object with the same attributes as the current object and subscribes each attribute
-          to auto-generated postbox channels.
+          The sync function takes in another object with the same attributes as the current object and subscribes each attribute
+          to auto-generated postbox channels. It also tracks the channels that are subscribed and published to avoid duplications.
         </p>
 
         <p>
@@ -141,7 +146,7 @@
         </p>
 
         <p>
-          The examples below are built upon the following example models:
+          The examples below are built upon the following example user instances:
         </p>
 
 <pre><code>var currentUser = new User({
@@ -165,7 +170,6 @@ anotherUser.name();
 > "John Doe"
 
 currentUser.sync(anotherUser);
-
 currentUser.name();
 > "Dan Matthews"
 
@@ -179,30 +183,26 @@ anotherUser.phoneNumbers();
 > ["(212) 555-5555"]
 
 currentUser.phoneNumbers.push('(917) 555-5555');
-
 anotherUser.phoneNumbers();
 > ["(212) 555-5555", "(917) 555-5555"]
 
 anotherUser.phoneNumbers.remove('(212) 555-5555');
-
 currentUser.phoneNumbers();
 > ["(917) 555-5555"]
 
 anotherUser.email('both@example.com');
-
 currentUser.email();
 > 'both@example.com'</pre></code>
 
         <p><em>example: <code>currentUser.sync(anotherUser, 'to')</code></em></p>
 
 <pre><code>currentUser.sync(anotherUser, 'to');
-currentUser.name('Dan');
 
+currentUser.name('Dan');
 anotherUser.name();
 > "Dan"
 
 anotherUser.name('John');
-
 anotherUser.name();
 > "John"
 
@@ -212,18 +212,101 @@ currentUser.name();
         <p><em>example: <code>currentUser.sync(anotherUser, 'from')</code></em></p>
 
 <pre><code>currentUser.sync(anotherUser, 'from');
-anotherUser.name('Dan');
 
+anotherUser.name('Dan');
 currentUser.name();
 > "Dan"
 
 currentUser.name('John');
-
 currentUser.name();
 > "John"
 
 anotherUser.name();
 > "Dan"</pre></code>
+
+        <p id="unsync"><code>.unsync(model [, how])</code></p>
+
+        <p>
+          This is essentially the reverse of sync. In order to work, the parameters must be the same as the original
+          call to sync.
+        </p>
+
+<pre><code>currentUser.sync(anotherUser);
+
+anotherUser.name();
+> "Dan Matthews"
+
+currentUser.unsync(anotherUser);
+
+anotherUser.name('John');
+anotherUser.name();
+> "John"
+
+currentUser.name();
+> "Dan Matthews"
+</code></pre>
+
+        <h3 id="other">Other Functions</h3>
+
+        <p>
+          If you look at the source, you'll see some other functions ahead of sync and unsync. They are each
+          described below, but no examples are given because they are only really ment to be used by sync
+          and unsync. If you find yourself wanting to set up syncing for only certain attributes, take a look
+          at the source code and it should be fairly straight forward.
+        </p>
+
+        <p><code>.channelFor(model)</code></p>
+
+        <p>
+          This is the correct way to get channels for syncing with another model. It returns the same channel
+          whether you call <code>model1.channelFor(model2)</code> or <code>model2.channelFor(model1)</code>.
+        </p>
+
+        <p><code>.generateSyncChannel()</code></p>
+
+        <p>
+          This is a random number / letter generator which is responsible for creating the channel parts used
+          for syncing. It is automaticly called when an instance is created using new. You should <em>never</em>
+          use this directly.
+        </p>
+
+        <p><code>.publishOn(attr, channel)</code></p>
+
+        <p>
+          A call to this function will publish updates for <code>attr</code> on <code>channel</code> providing
+          that it is not already publishing on <code>channel</code>.
+        </p>
+
+        <p><code>.stopPublishingOn(attr, channel)</code></p>
+
+        <p>
+          This is the reverse of <code>.publishOn</code>.
+        </p>
+
+        <p><code>.subscribeTo(attr, channel)</code></p>
+
+        <p>
+          A call to this function will subscribe to <code>channel</code> and update <code>attr</code> with the
+          messages received.
+        </p>
+
+        <p><code>.unsubscribeFrom(attr, channel)</code></p>
+
+        <p>
+          This is the reverse of <code>.subscribeTo</code>.
+        </p>
+
+        <p><code>.syncWith(attr, channel)</code></p>
+
+        <p>
+          A call to this function will subscribe to and publish on <code>channel</code>.
+        </p>
+
+        <p><code>.stopSyncingWith(attr, channel)</code></p>
+
+        <p>
+          This is the reverse of <code>.syncWith</code>.
+        </p>
 
       </section>
       <footer>
